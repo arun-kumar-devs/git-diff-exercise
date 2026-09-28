@@ -1,51 +1,67 @@
-import { useState } from 'react';
 import type { Commit } from '../types';
-import { relativeTime, shortSha } from '../lib/format';
-import { Icon } from './Icon';
+import { relativeTime } from '../lib/format';
 
+/** Commit data required to render the commit summary and identity details. */
 interface Props {
   commit: Commit;
-  owner: string;
-  repository: string;
 }
 
-export function CommitHeader({ commit, owner, repository }: Props) {
-  const [copied, setCopied] = useState(false);
-  const copySha = async () => {
-    try {
-      await navigator.clipboard.writeText(commit.oid);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
-    } catch {
-      // Clipboard permissions can be unavailable in some browsers/iframes.
-    }
-  };
+/** Displays the commit message, author, committer, and parent identifiers. */
+export function CommitHeader({ commit }: Props) {
+  const authorDate = relativeTime(commit.author.date);
+  const committerDate = relativeTime(commit.committer.date);
+
+  const showCommitter =
+    commit.committer.name !== commit.author.name ||
+    commit.committer.date !== commit.author.date;
 
   return (
     <header className="commit-header">
-      <div className="breadcrumb">
-        <span className="breadcrumb-owner">{owner}</span>
-        <span className="breadcrumb-slash">/</span>
-        <span>{repository}</span>
-      </div>
       <div className="commit-main">
-        <img className="avatar avatar-large" src={commit.author.avatarUrl} alt="" />
-        <div className="commit-copy">
-          <h1>{commit.subject}</h1>
+        <img
+          className="avatar avatar-large"
+          src={commit.author.avatarUrl}
+          alt=""
+        />
+
+        <div className="commit-content">
+          <span className="commit-subject">{commit.subject}</span>
+
           <div className="commit-meta">
-            <span>By <strong>{commit.author.name}</strong></span>
-            <span>{relativeTime(commit.author.date)}</span>
-            <button className="sha-button" onClick={copySha} title="Copy commit SHA">
-              <code>{shortSha(commit.oid)}</code>
-              <Icon name={copied ? 'check' : 'copy'} />
-            </button>
+            <span>
+              Authored by <strong>{commit.author.username ?? commit.author.name}</strong>
+            </span>
+            <span>{authorDate}</span>
           </div>
+
+          {commit.body.trim() && (
+            <span className="commit-body">{commit.body}</span>
+          )}
         </div>
-      </div>
-      {commit.body.trim() && <p className="commit-body">{commit.body}</p>}
-      <div className="commit-details">
-        <span><span className="detail-label">Commit</span> <code>{shortSha(commit.oid)}</code></span>
-        {commit.parents[0] && <span><span className="detail-label">Parent</span> <code>{shortSha(commit.parents[0].oid)}</code></span>}
+
+        <div className="commit-details">
+          {showCommitter && (
+            <div className="committer-meta">
+              <span>
+                Committed by{' '}
+                <strong>{commit.committer.name}</strong>
+              </span>
+              <span>{committerDate}</span>
+            </div>
+          )}
+
+          <div className="current-commit-detail">
+            <span className="detail-label">Commit</span>
+            <code>{commit.oid}</code>
+          </div>
+
+          {commit.parents[0] && (
+            <div className="parent-commit-detail">
+              <span className="detail-label">Parent</span>
+              <code>{commit.parents[0].oid}</code>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

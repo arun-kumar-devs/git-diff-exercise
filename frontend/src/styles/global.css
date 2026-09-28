@@ -1,89 +1,444 @@
 :root {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: #26242b;
-  background: #ffffff;
+  background-color: #fbfdff;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
 
-* { box-sizing: border-box; }
-body { margin: 0; min-width: 320px; background: #fff; }
-button { font: inherit; }
-a { color: inherit; }
+* {
+  box-sizing: border-box;
+}
 
-.page-shell { min-height: 100vh; padding: 64px 32px 96px; }
-.content-column { width: min(1320px, 100%); margin: 0 auto; }
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #fff;
+}
 
-.commit-header { padding: 0 12px 30px; border-bottom: 1px solid #e7e5e9; }
-.breadcrumb { display: flex; align-items: center; gap: 6px; color: #68646e; font-size: 14px; margin-bottom: 25px; }
-.breadcrumb-owner { color: #26242b; font-weight: 650; }
-.breadcrumb-slash { color: #b2aeb7; }
-.commit-main { display: flex; align-items: flex-start; gap: 16px; }
-.avatar { border-radius: 50%; object-fit: cover; background: #f0eef3; }
-.avatar-large { width: 48px; height: 48px; flex: 0 0 48px; }
-.commit-copy { min-width: 0; flex: 1; }
-.commit-copy h1 { margin: 0; font-size: clamp(22px, 2vw, 30px); line-height: 1.22; letter-spacing: -.025em; font-weight: 650; color: #222027; }
-.commit-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 10px; color: #77727d; font-size: 14px; }
-.commit-meta strong { color: #403c45; font-weight: 600; }
-.sha-button { display: inline-flex; align-items: center; gap: 6px; border: 0; padding: 3px 7px; border-radius: 6px; color: #67616e; background: #f5f3f6; cursor: pointer; }
-.sha-button:hover { background: #edeaf0; }
-.sha-button code { font: 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-.commit-body { max-width: 900px; margin: 22px 0 0 64px; color: #55515b; white-space: pre-wrap; line-height: 1.65; font-size: 14px; }
-.commit-details { display: flex; flex-wrap: wrap; gap: 18px; margin: 24px 0 0 64px; color: #5f5a65; font-size: 13px; }
-.commit-details code { font: 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #36313c; }
-.detail-label { color: #8c8790; margin-right: 5px; }
+button {
+  font: inherit;
+}
 
-.diff-summary { display: flex; align-items: center; justify-content: space-between; padding: 25px 12px 16px; color: #5e5963; font-size: 14px; }
-.diff-summary strong { color: #27242b; font-weight: 650; }
-.diff-legend { display: flex; gap: 14px; color: #77727d; }
-.diff-legend span { display: inline-flex; align-items: center; gap: 6px; }
-.diff-legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
-.legend-add { background: #bfeeb0; }
-.legend-remove { background: #ffc9d2; }
+a {
+  color: inherit;
+}
 
-.diff-list { display: flex; flex-direction: column; gap: 18px; }
-.diff-file { border: 1px solid #e2dfe5; border-radius: 8px; overflow: hidden; background: #fff; box-shadow: 0 1px 2px rgba(30, 24, 40, .025); }
-.file-header { width: 100%; display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 16px; border: 0; border-bottom: 1px solid #e9e6eb; background: #fbfafc; color: #343039; cursor: pointer; text-align: left; }
-.file-header:hover { background: #f7f5f8; }
-.chevron { display: inline-flex; transition: transform .16s ease; color: #77717c; }
-.chevron.open { transform: rotate(0deg); }
-.chevron:not(.open) { transform: rotate(-90deg); }
-.file-icon { color: #827b87; display: inline-flex; }
-.file-path { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight: 550; }
-.file-kind { margin-left: auto; color: #8a838e; font-size: 12px; }
-.hunk-count { color: #9a949e; font-size: 12px; margin-left: 4px; }
+.page-shell {
+  min-height: 100vh;
+  padding: 2rem;
+}
 
-.file-content { overflow-x: auto; }
-.diff-hunk + .diff-hunk { border-top: 7px solid #fff; }
-.hunk-header { min-height: 34px; display: flex; align-items: center; padding: 0 14px; background: #f5effb; color: #8755b8; border-bottom: 1px solid #eadff4; font: 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-.diff-line { min-width: 760px; display: grid; grid-template-columns: 56px 56px 22px minmax(0, 1fr); min-height: 25px; line-height: 25px; font: 12px/25px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #3f3a43; }
-.diff-line.context { background: #fff; }
-.diff-line.addition { background: #d8ffcb; }
-.diff-line.deletion { background: #ffe4e9; }
-.line-number { user-select: none; text-align: right; padding-right: 12px; color: #9b959e; border-right: 1px solid rgba(50,40,60,.045); }
-.line-prefix { text-align: center; color: #756e79; user-select: none; }
-.addition .line-prefix { color: #38822d; font-weight: 700; }
-.deletion .line-prefix { color: #a34052; font-weight: 700; }
-.line-code { white-space: pre; overflow: visible; }
-.empty-hunk, .empty-diff { padding: 28px; color: #77717b; font-size: 14px; }
+.content-column {
+  width: min(1320px, 100%);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
 
-.state-card { width: min(560px, 100%); margin: 120px auto; text-align: center; padding: 44px 32px; border: 1px solid #e4e0e7; border-radius: 12px; box-shadow: 0 4px 18px rgba(34,27,45,.04); }
-.state-card h2 { margin: 18px 0 8px; font-size: 20px; }
-.state-card p { margin: 0; color: #77717d; font-size: 14px; line-height: 1.5; }
-.spinner { width: 28px; height: 28px; margin: 0 auto; border: 3px solid #ece8ef; border-top-color: #9c5bd1; border-radius: 50%; animation: spin .75s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.error-mark { width: 34px; height: 34px; margin: 0 auto; border-radius: 50%; display: grid; place-items: center; background: #ffe4e9; color: #a34052; font-weight: 750; }
-.error-card a { display: inline-block; margin-top: 20px; color: #7541a3; font-size: 14px; }
+.commit-main {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  column-gap: 16px;
+  align-items: start;
+}
+
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  background: #f0eef3;
+}
+
+.avatar-large {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+}
+
+.commit-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.commit-content .commit-subject {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: #39496A;
+}
+
+.commit-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  color: #6D727C;
+  font-weight:400;
+  font-family: Arial;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.commit-meta strong {
+  color: #39496A;
+  font-weight: 600;
+}
+
+.commit-content .commit-body {
+  font-family: Arial;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #39496A;
+  max-width: 589px;
+}
+
+.commit-details {
+  min-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.committer-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 2px;
+  color: #6D727C;
+  font-family: Montserrat;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 5%;
+  text-align: right;
+  vertical-align: middle;
+
+}
+
+.committer-meta strong {
+  color: #39496A;
+  font-weight: 700;
+}
+
+.current-commit-detail {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  white-space: nowrap;
+  font-family: montserrat;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 5%;
+  color:#6D727C;
+}
+
+.current-commit-detail code {
+  color: #39496A;
+}
+
+.parent-commit-detail {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  white-space: nowrap;
+  color:#6D727C;
+  font-family: Courier New;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 20px;
+  letter-spacing: 0%;
+  text-align: right;
+  vertical-align: middle;
+}
+
+.parent-commit-detail code {
+  color: #1c7cd6;
+}
+
+.detail-label {
+  color: #8c8790;
+  min-width: 42px;
+}
+
+
+.diff-legend {
+  display: flex;
+  gap: 14px;
+  color: #77727d;
+}
+
+.diff-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.diff-legend i {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.legend-add {
+  background: #bfeeb0;
+}
+
+.legend-remove {
+  background: #ffc9d2;
+}
+
+.diff-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.diff-file {
+ display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.file-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 0;
+  background-color: transparent;
+  color: #343039;
+  cursor: pointer;
+  text-align: left;
+}
+
+.chevron {
+  display: inline-flex;
+  transition: transform .16s ease;
+  color: #77717c;
+}
+
+.chevron.open {
+  transform: rotate(0deg);
+}
+
+.chevron:not(.open) {
+  transform: rotate(-90deg);
+}
+
+.file-path {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: Arial;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 141%;
+  letter-spacing: 4%;
+  color:#1c7cd6;
+
+}
+
+.file-content {
+  overflow-x: auto;
+  padding: 4px 5px;
+  border-radius: 2px;
+  border: 1px solid #e7ebf1;
+}
+
+.diff-hunk+.diff-hunk {
+  border-top: 7px solid #fff;
+}
+
+.hunk-header {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  color: #6D84B0;
+  font-family: Courier New;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0%;
+
+}
+
+.diff-line {
+  min-width: 760px;
+  display: grid;
+  grid-template-columns: 37px 37px 22px minmax(0, 1fr);
+  line-height: 25px;
+  color: #3f3a43;
+}
+
+.diff-line.context {
+  background: #fff;
+}
+
+.diff-line.addition {
+  background: #d8ffcb;
+}
+
+.diff-line.deletion {
+  background: #ffe4e9;
+}
+
+.line-number {
+  user-select: none;
+  font-family: Courier New;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0%;
+  text-align: right;
+  padding: 0px 4px;  
+  color: #6078A9;
+}
+
+.diff-line.context .line-number.head-number {
+  background: #F8FBFF;
+}
+
+.line-prefix {
+  text-align: center;
+  color: #657b83;
+  user-select: none;
+  font-family: Courier New;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0%;
+
+}
+
+.addition .line-prefix {
+  color: #38822d;
+  font-weight: 700;
+}
+
+.deletion .line-prefix {
+  color: #a34052;
+  font-weight: 700;
+}
+
+.line-code {
+  white-space: pre;
+  overflow: visible;
+  font-family: Courier New;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0%;
+  color: #657b83;
+}
+
+.empty-hunk,
+.empty-diff {
+  padding: 28px;
+  color: #77717b;
+  font-size: 14px;
+}
+
+.state-card {
+  width: min(560px, 100%);
+  margin: 120px auto;
+  text-align: center;
+  padding: 44px 32px;
+  border: 1px solid #e4e0e7;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(34, 27, 45, .04);
+}
+
+.state-card h2 {
+  margin: 18px 0 8px;
+  font-size: 20px;
+}
+
+.state-card p {
+  margin: 0;
+  color: #77717d;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  margin: 0 auto;
+  border: 3px solid #ece8ef;
+  border-top-color: #9c5bd1;
+  border-radius: 50%;
+  animation: spin .75s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-mark {
+  width: 34px;
+  height: 34px;
+  margin: 0 auto;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #ffe4e9;
+  color: #a34052;
+  font-weight: 750;
+}
+
+.error-card a {
+  display: inline-block;
+  margin-top: 20px;
+  color: #7541a3;
+  font-size: 14px;
+}
 
 @media (max-width: 760px) {
-  .page-shell { padding: 32px 14px 60px; }
-  .commit-header { padding-inline: 2px; }
-  .commit-body, .commit-details { margin-left: 0; }
-  .commit-main { gap: 12px; }
-  .avatar-large { width: 40px; height: 40px; flex-basis: 40px; }
-  .commit-copy h1 { font-size: 21px; }
-  .diff-summary { padding-inline: 2px; }
-  .file-header { padding-inline: 11px; }
-  .file-kind { display: none; }
-  .hunk-count { margin-left: auto; }
+  .page-shell {
+    padding: 32px 14px 60px;
+  }
+
+  .commit-header {
+    padding-inline: 2px;
+  }
+
+ .commit-main {
+    grid-template-columns: 40px minmax(0, 1fr);
+    column-gap: 12px;
+  }
+
+  .avatar-large {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+  }
+
+  .commit-content h1 {
+    font-size: 21px;
+  }
+
+  .file-header {
+    padding-inline: 11px;
+  }
+
+  .file-kind {
+    display: none;
+  }
+
+  .hunk-count {
+    margin-left: auto;
+  }
 }

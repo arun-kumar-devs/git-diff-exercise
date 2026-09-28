@@ -2,7 +2,9 @@ import type { Commit, DiffHunk, DiffLine, FileDifference, Signature, ChangeKind 
 
 const API_BASE = 'https://api.github.com';
 
+/** Error returned when GitHub responds with a non-success HTTP status. */
 export class GitHubApiError extends Error {
+  /** @param status HTTP status returned by GitHub. @param message Provider error detail. */
   constructor(public readonly status: number, message: string) {
     super(message);
     this.name = 'GitHubApiError';
@@ -22,6 +24,7 @@ interface GitHubCommitResponse {
   files?: GitHubFile[];
 }
 
+/** File entry returned by GitHub's commit endpoint. */
 export interface GitHubFile {
   status: string;
   filename: string;
@@ -29,6 +32,7 @@ export interface GitHubFile {
   patch?: string;
 }
 
+/** Builds GitHub request headers, adding authorization only when configured. */
 function headers() {
   const token = process.env.GITHUB_TOKEN;
   return {
@@ -38,6 +42,7 @@ function headers() {
   };
 }
 
+/** Performs a typed GitHub request and raises GitHubApiError for HTTP failures. */
 async function githubGet<T>(path: string): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, { headers: headers() });
   if (!response.ok) {
@@ -53,22 +58,26 @@ async function githubGet<T>(path: string): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+/** Separates the first commit-message line from its body and removes separator blanks. */
 function splitMessage(message: string): { subject: string; body: string } {
   const [subject = '', ...rest] = message.split(/\r?\n/);
   while (rest.length && rest[0] === '') rest.shift();
   return { subject, body: rest.join('\n') };
 }
 
+/** Combines Git commit identity data with GitHub profile data and safe fallbacks. */
 function signature(raw: GitHubCommitResponse['commit']['author'], user: GitHubCommitResponse['author'] | null): Signature {
   const value = raw ?? { name: user?.login ?? 'Unknown', email: '', date: new Date(0).toISOString() };
   return {
     name: value.name,
+    username: user?.login,
     email: value.email,
     date: value.date,
     avatarUrl: user?.avatar_url ?? `https://github.com/${encodeURIComponent(user?.login ?? 'ghost')}.png`,
   };
 }
 
+/** Fetches commit metadata and converts it to the API's normalized commit model. */
 export async function fetchCommit(owner: string, repository: string, oid: string): Promise<Commit> {
   const raw = await githubGet<GitHubCommitResponse>(`/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repository)}/commits/${oid}`);
   const { subject, body } = splitMessage(raw.commit.message);
@@ -87,6 +96,10 @@ async function githubGetFilesPage(owner: string, repository: string, oid: string
   return raw.files ?? [];
 }
 
+/**
+ * Fetches changed files in pages of 100, stopping at the first partial page or
+ * after 30 pages (the maximum supported by GitHub's commit endpoint).
+ */
 export async function fetchFiles(owner: string, repository: string, oid: string): Promise<GitHubFile[]> {
   const files: GitHubFile[] = [];
   for (let page = 1; page <= 30; page += 1) {
@@ -97,12 +110,17 @@ export async function fetchFiles(owner: string, repository: string, oid: string)
   return files;
 }
 
+/** Extracts the starting base and head line numbers from a unified hunk header. */
 function parseHunkHeader(header: string) {
   const match = header.match(/^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/);
   if (!match) return null;
   return { base: Number(match[1]), head: Number(match[3]) };
 }
 
+/**
+ * Parses a unified diff patch into hunks with independent base and head line
+ * numbers. A missing patch (such as for a binary file) produces no hunks.
+ */
 export function parsePatch(patch: string | undefined): DiffHunk[] {
   if (!patch) return [];
   const lines = patch.replace(/\r\n/g, '\n').split('\n');
@@ -137,6 +155,7 @@ export function parsePatch(patch: string | undefined): DiffHunk[] {
   return hunks;
 }
 
+/** Converts GitHub's file status vocabulary to the API's change-kind values. */
 function mapChangeKind(status: string): ChangeKind {
   switch (status) {
     case 'added': return 'ADDED';
@@ -148,6 +167,7 @@ function mapChangeKind(status: string): ChangeKind {
   }
 }
 
+/** Converts a GitHub file status, paths, and patch into the public diff model. */
 export function mapFile(file: GitHubFile): FileDifference {
   const deleted = file.status === 'removed';
   const added = file.status === 'added';
@@ -161,6 +181,7 @@ export function mapFile(file: GitHubFile): FileDifference {
   };
 }
 
+/** Fetches and normalizes all changed files for a commit. */
 export async function fetchDiff(owner: string, repository: string, oid: string): Promise<FileDifference[]> {
   const files = await fetchFiles(owner, repository, oid);
   return files.map(mapFile);

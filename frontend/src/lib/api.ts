@@ -1,5 +1,6 @@
 import type { Commit, FileDifference } from '../types';
 
+/** Fetches JSON from the backend and includes its error message when available. */
 async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
   const response = await fetch(url, { signal, headers: { Accept: 'application/json' } });
   if (!response.ok) {
@@ -15,10 +16,12 @@ async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+/** Fetches the backend's single-item-array response for a commit. */
 export async function getCommit(owner: string, repository: string, oid: string, signal?: AbortSignal) {
-  return getJson<Commit[]>(`/repositories/${encodeURIComponent(owner)}/${encodeURIComponent(repository)}/commits/${oid}`, signal);
+  return getJson<Commit[]>(`/api/repositories/${encodeURIComponent(owner)}/${encodeURIComponent(repository)}/commits/${oid}`, signal);
 }
 
+/** Fetches normalized file changes for a commit; the signal can cancel navigation requests. */
 export async function getDiff(owner: string, repository: string, oid: string, signal?: AbortSignal) {
-  return getJson<FileDifference[]>(`/repositories/${encodeURIComponent(owner)}/${encodeURIComponent(repository)}/commits/${oid}/diff`, signal);
+  return getJson<FileDifference[]>(`/api/repositories/${encodeURIComponent(owner)}/${encodeURIComponent(repository)}/commits/${oid}/diff`, signal);
 }

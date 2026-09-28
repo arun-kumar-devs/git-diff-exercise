@@ -1,3 +1,4 @@
+/** Formats an ISO timestamp as relative time, preserving invalid input verbatim. */
 export function relativeTime(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
@@ -20,10 +21,12 @@ export function relativeTime(value: string): string {
   return 'just now';
 }
 
+/** Returns the conventional seven-character abbreviated commit identifier. */
 export function shortSha(sha: string): string {
   return sha.slice(0, 7);
 }
 
+/** Converts an uppercase change-kind value into a display label. */
 export function changeLabel(kind: string): string {
   return kind.charAt(0) + kind.slice(1).toLowerCase().replace('_', ' ');
 }

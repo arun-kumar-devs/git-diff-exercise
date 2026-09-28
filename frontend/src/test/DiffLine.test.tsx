@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { DiffLine } from './DiffLine';
+import { DiffLine } from '../components/DiffLine';
 
 describe('DiffLine', () => {
   it('renders an added line with a head line number', () => {

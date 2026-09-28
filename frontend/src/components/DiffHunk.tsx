@@ -1,6 +1,7 @@
 import type { DiffHunk as DiffHunkModel } from '../types';
 import { DiffLine } from './DiffLine';
 
+/** Renders a unified-diff hunk header followed by its numbered source lines. */
 export function DiffHunk({ hunk }: { hunk: DiffHunkModel }) {
   return (
     <section className="diff-hunk">

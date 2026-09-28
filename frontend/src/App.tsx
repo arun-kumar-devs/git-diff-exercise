@@ -8,6 +8,7 @@ import { LoadingState, ErrorState } from './components/States';
 
 const SHA_PATTERN = /^[0-9a-f]{40}$/;
 
+/** Loads and renders commit metadata and its diff for the current route. */
 export function CommitPage() {
   const { owner, repository, commitSHA } = useParams();
   const [commit, setCommit] = useState<Commit | null>(null);
@@ -48,11 +49,7 @@ export function CommitPage() {
         {!loading && error && <ErrorState message={error} />}
         {!loading && !error && commit && (
           <>
-            <CommitHeader commit={commit} owner={owner} repository={repository} />
-            <section className="diff-summary">
-              <div><strong>{files.length}</strong> {files.length === 1 ? 'changed file' : 'changed files'}</div>
-              <div className="diff-legend"><span><i className="legend-add" />Added</span><span><i className="legend-remove" />Removed</span></div>
-            </section>
+            <CommitHeader commit={commit}/>
             <section className="diff-list" aria-label="Commit diff">
               {files.length ? files.map((file, index) => <DiffFile key={`${file.headFile?.path ?? file.baseFile?.path}-${index}`} file={file} index={index} />) : <div className="empty-diff">This commit has no textual file differences.</div>}
             </section>
@@ -63,6 +60,7 @@ export function CommitPage() {
   );
 }
 
+/** Root view rendered by the commit route. */
 export function App() {
   return <CommitPage />;
 }

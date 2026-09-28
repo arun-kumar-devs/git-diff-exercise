@@ -1,7 +1,9 @@
 import type { SVGProps } from 'react';
 
+/** Supported built-in symbols rendered by {@link Icon}. */
 type Name = 'chevron' | 'copy' | 'file' | 'check' | 'external' | 'commit';
 
+/** Renders a small inline SVG symbol and forwards standard SVG attributes. */
 export function Icon({ name, ...props }: SVGProps<SVGSVGElement> & { name: Name }) {
   const common = { width: 16, height: 16, viewBox: '0 0 16 16', fill: 'none', ...props };
   if (name === 'chevron') return <svg {...common}><path d="m4 6 4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;

@@ -1,5 +1,6 @@
 import type { DiffLine as DiffLineModel } from '../types';
 
+/** Renders an added, removed, or unchanged diff row with both line numbers. */
 export function DiffLine({ line }: { line: DiffLineModel }) {
   const prefix = line.content.charAt(0);
   const code = line.content.length ? line.content.slice(1) : '';
