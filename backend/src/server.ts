@@ -1,12 +1,16 @@
 import express from 'express';
 import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
 import { fetchCommit, fetchDiff, GitHubApiError } from './github.js';
+import { openApiDocument } from './openapi.js';
 
 /** Express application exposing the commit and diff endpoints. */
 export const app = express();
 app.disable('x-powered-by');
 app.use(cors());
 app.use(express.json());
+app.get('/openapi.json', (_req, res) => res.json(openApiDocument));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 const SHA_PATTERN = /^[0-9a-f]{40}$/;
 

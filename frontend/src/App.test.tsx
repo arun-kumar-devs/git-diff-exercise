@@ -1,6 +1,6 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CommitPage } from './App';
 
 const commit = {
@@ -25,24 +25,64 @@ const diff = [{
   }],
 }];
 
+const validSha = 'a1bf367b3af680b1182cc52bb77ba095764a11f9';
+
+function renderCommitPage(commitSHA = validSha) {
+  return render(
+    <MemoryRouter initialEntries={[`/repositories/acme/project/commit/${commitSHA}`]}>
+      <Routes><Route path="/repositories/:owner/:repository/commit/:commitSHA" element={<CommitPage />} /></Routes>
+    </MemoryRouter>,
+  );
+}
+
+function mockApi(commits: unknown = [commit], files: unknown = diff) {
+  vi.spyOn(globalThis, 'fetch').mockImplementation(async input => new Response(
+    String(input).endsWith('/diff') ? JSON.stringify(files) : JSON.stringify(commits),
+    { status: 200, headers: { 'Content-Type': 'application/json' } },
+  ));
+}
+
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
+
 describe('CommitPage', () => {
   it('loads commit metadata and diff', async () => {
-    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
-      const url = String(input);
-      return new Response(url.endsWith('/diff') ? JSON.stringify(diff) : JSON.stringify([commit]), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    });
+    mockApi();
+    renderCommitPage();
 
-    render(
-      <MemoryRouter initialEntries={['/repositories/acme/project/commit/a1bf367b3af680b1182cc52bb77ba095764a11f9']}>
-        <Routes><Route path="/repositories/:owner/:repository/commit/:commitSHA" element={<CommitPage />} /></Routes>
-      </MemoryRouter>,
-    );
-
-    await waitFor(() => expect(screen.getByRole('heading', { name: 'Example commit' })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Example commit')).toBeInTheDocument());
     expect(screen.getByText('src/example.ts')).toBeInTheDocument();
     expect(screen.getByText('new')).toBeInTheDocument();
+  });
+
+  it('rejects an invalid SHA without making API requests', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch');
+    renderCommitPage('ABC123');
+    expect(await screen.findByRole('alert')).toHaveTextContent('40-character lowercase hexadecimal');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('shows the backend error message when loading fails', async () => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response(
+      JSON.stringify({ message: 'Repository not found.' }),
+      { status: 404, headers: { 'Content-Type': 'application/json' } },
+    ));
+    renderCommitPage();
+    expect(await screen.findByRole('alert')).toHaveTextContent('Repository not found.');
+  });
+
+  it('shows a useful error if the API returns no commit metadata', async () => {
+    mockApi([], []);
+    renderCommitPage();
+    expect(await screen.findByRole('alert')).toHaveTextContent('The API returned no commit metadata.');
+  });
+
+  it('renders the empty-diff state when a commit has no changed files', async () => {
+    mockApi([commit], []);
+    renderCommitPage();
+    expect(await screen.findByText('This commit has no textual file differences.')).toBeInTheDocument();
+    expect(screen.getByText('Example commit')).toBeInTheDocument();
   });
 });

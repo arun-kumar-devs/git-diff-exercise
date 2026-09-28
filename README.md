@@ -267,6 +267,36 @@ Example:
 
 During frontend development, these backend endpoints are reached through the `/api` Vite proxy.
 
+### Swagger documentation
+
+The backend publishes an OpenAPI 3.0 specification and an interactive Swagger UI. Start the backend from the repository root:
+
+```bash
+npm run dev:backend
+```
+
+Then open the interactive API documentation at:
+
+```text
+http://localhost:5000/api-docs/
+```
+
+The raw OpenAPI JSON is available at `http://localhost:5000/openapi.json`. In Swagger UI, expand either endpoint, select **Try it out**, enter a GitHub owner, repository, and full 40-character commit SHA, then select **Execute**. The backend calls GitHub, so internet access is required; unauthenticated requests are subject to GitHub's rate limits. Configure `GITHUB_TOKEN` as described above to use an authenticated GitHub request.
+
+### cURL and Postman
+
+With the backend running, run either command from PowerShell to request the example commit from `golemfactory/clay`:
+
+```powershell
+curl.exe --request GET --url "http://localhost:5000/repositories/golemfactory/clay/commits/a1bf367b3af680b1182cc52bb77ba095764a11f9" --header "Accept: application/json"
+```
+
+```powershell
+curl.exe --request GET --url "http://localhost:5000/repositories/golemfactory/clay/commits/a1bf367b3af680b1182cc52bb77ba095764a11f9/diff" --header "Accept: application/json"
+```
+
+To load either request into Postman, select **Import**, choose **Raw text**, paste the complete cURL command, and select **Continue** then **Import**. The imported request targets the local backend; the backend itself contacts GitHub.
+
 ---
 
 ## API Error Handling
@@ -301,6 +331,8 @@ Individual workspace tests can also be run with:
 npm run test:backend
 npm run test:frontend
 ```
+
+Backend tests are grouped under `backend/test` by parser, GitHub integration, and HTTP server behavior. Frontend tests live alongside their corresponding helpers and components, with route-level coverage in `frontend/src/App.test.tsx`.
 
 The tests focus on behaviour that is important to preserve, including GitHub response mapping, diff parsing, validation, and UI behaviour.
 
