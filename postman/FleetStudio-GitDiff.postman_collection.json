@@ -1,0 +1,30 @@
+{
+  "info": {
+    "name": "Fleet Studio Git Diff API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "owner", "value": "golemfactory" },
+    { "key": "repository", "value": "clay" },
+    { "key": "oid", "value": "a1bf367b3af680b1182cc52bb77ba095764a11f9" }
+  ],
+  "item": [
+    {
+      "name": "Get commit",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/repositories/{{owner}}/{{repository}}/commits/{{oid}}"
+      }
+    },
+    {
+      "name": "Get diff",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/repositories/{{owner}}/{{repository}}/commits/{{oid}}/diff"
+      }
+    }
+  ]
+}
